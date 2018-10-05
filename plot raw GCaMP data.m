@@ -1,4 +1,4 @@
-%prep zscored traces
+%prep zscored traces hallo 
 
 for i=1:length(dend)
     dend(i).ztrace=zscore(dend(i).normtrace);
