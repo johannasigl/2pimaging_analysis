@@ -11,37 +11,43 @@ registers2p %gui
 %dataset 2. Save in file of dataset 2
 %%
 %create list of no. of baseline files 
-db.raw_file= '/Volumes/Johanna Ima/Suite2p_analysis/raw/';
-db.animal = '857';
-db.root=strcat(db.raw_file, db.animal) ;
+db.raw_file = uigetdir;%chose which raw animal file should be analysed 
+name_components = strsplit(selpath,'\');
+db.animal = name_components{1,(length(name_components))};
+db.root=(db.raw_file) ;
 cd(db.root) %put in the animal 
-db.folder_list=dir ('*18*'); %list all files that start with 18 to avoid invisible files 
-db.FOV='/4';
+db.folder_list=dir ('*p*'); %list all files that start with 18 to avoid invisible files 
+db.FOV='/2';
 
 for i= 1:numel(db.folder_list)
     db.idx=strcat('/',db.folder_list(i).name);
     db.subf=strcat(db.root,db.idx,db.FOV);
+    if exist (db.subf)
     cd (db.subf)
     file=dir('*_bsl_*.tif');
     db.bsl_files(i,1)=numel(file);
+    else continue 
+    end 
 end 
 
 %%
 %%load dat files into data struct
 
-db.results_file= '/Volumes/Johanna Ima/Suite2p_analysis/results/';
+db.results_file= uigetdir;
+name_components = strsplit(selpath,'\');
 %db.results_file='/Users/Johannasigl-glockner/Lab/SCNN1A/for holidays/';
-db.animal = '857';
-db.root=strcat(db.results_file, db.animal) ;
+db.animal = name_components{1,(length(name_components))};
+db.root=db.results_file;
 cd(db.root) %put in the animal 
-db.folder_list=dir ('*18*'); %list all files that start with 18 to avoid invisible files 
+db.folder_list=dir ('*p*'); %list all files that start with 18 to avoid invisible files 
 db.FOV='2';
-name=strcat('m',db.animal,'_',db.FOV,'_raw');
-name2=strcat('m',db.animal,'_',db.FOV,'_db');
+name=strcat(db.animal,'_',db.FOV,'_raw');
+name2=strcat(db.animal,'_',db.FOV,'_db');
 
 for i= 1:numel(db.folder_list)
     db.idx=strcat('/',db.folder_list(i).name);
     db.subf=strcat(db.root,db.idx,'/',db.FOV);
+    if exist(db.subf)
     cd (db.subf)
     db.file=dir('*_proc.mat');
         if isempty(db.file)==0
@@ -58,13 +64,15 @@ for i= 1:numel(db.folder_list)
         data(i).date = db.folder_list(i).name;
         data(i).bsl_files = db.bsl_files(i,1);
         db.file=dir('*plane1_reg.mat');
-        if isempty(db.file)==0
-        x=length(db.file)%put this in in case their are hidden copies 
-        load (db.file(x).name);   
-        data(i).reg = regi;
-        else 
+            if isempty(db.file)==0
+            x=length(db.file)%put this in in case their are hidden copies 
+            load (db.file(x).name);   
+            data(i).reg = regi;
+            else 
+            end 
+        else  
         end 
-    else  
+    else 
     end 
 end 
 
@@ -76,19 +84,19 @@ save(name2,'db')
 clearvars -except data db
 
 %% create anchor day 
-k=5;%which one is the anchor day
+k=2;%which one is the anchor day
 x=(db.bsl_files(k,1)*4000)+1;
 temp=data(k).dat.traces;
-%temp=data(k).dat.traces(:,x:end);
+temp=data(k).dat.traces(:,x:end);
 day=['day_' num2str(k,'%d')];
 
 dims=size(temp);
-idx=[1:345:dims(1,2)]; %make sure frame number is correct 
+idx=[1:230:dims(1,2)]; %make sure frame number is correct 
 dims2=size(idx);
 for n=1:dims(1,1)
     for i=1:dims2(1,2)
         idx1=idx(i);
-        cells{n,k}(:,i)=(temp(n,idx(i):(idx(i)+344)));
+        cells{n,k}(:,i)=(temp(n,idx(i):(idx(i)+229)));%make sure its the right number of frames 
     end 
 end 
 %create cell mask figure 
@@ -103,6 +111,11 @@ for i=1:dims(1,1)
     text(data(k).dat.xcoord{i,1}(1,1),data(k).dat.ycoord{i,1}(1,1),num2str(i),'Color','red','FontSize',10);
 end 
 savefig(name3)
+%save here cells already 
+cd(db.root)
+name4=strcat(db.animal,'_',db.FOV,'_idcells');
+save(name4,'cells')
+
 clearvars -except data db cells 
 %% 
 %add subseqeunt or prior days with matched cells 
