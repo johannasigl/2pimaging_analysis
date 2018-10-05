@@ -1,4 +1,4 @@
-%how many cells are complete? 
+%how many cells are complete? can I see this? 
 dims=size(cells);
 M=[];
 for n=1:dims(1,2)
