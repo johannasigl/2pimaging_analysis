@@ -12,7 +12,7 @@ registers2p %gui
 %%
 %create list of no. of baseline files 
 db.raw_file = uigetdir;%chose which raw animal file should be analysed 
-name_components = strsplit(selpath,'\');
+name_components = strsplit(db.raw_file,'\');
 db.animal = name_components{1,(length(name_components))};
 db.root=(db.raw_file) ;
 cd(db.root) %put in the animal 
@@ -34,7 +34,7 @@ end
 %%load dat files into data struct
 
 db.results_file= uigetdir;
-name_components = strsplit(selpath,'\');
+name_components = strsplit(db.results_file,'\');
 %db.results_file='/Users/Johannasigl-glockner/Lab/SCNN1A/for holidays/';
 db.animal = name_components{1,(length(name_components))};
 db.root=db.results_file;
@@ -120,7 +120,7 @@ clearvars -except data db cells
 %% 
 %add subseqeunt or prior days with matched cells 
 
-for h=[2 3 6 7] % day that are added; 
+for h=[3] % day that are added; 
     day=['day_' num2str(h,'%d')];
     temp=[];
     temp=data(h).dat.traces;
@@ -128,12 +128,12 @@ for h=[2 3 6 7] % day that are added;
     temp=temp(:,x:end);
 
     dims=size(temp);
-    idx=[1:345:dims(1,2)];
+    idx=[1:230:dims(1,2)];
     dims2=size(idx);
     for n=1:dims(1,1)
         for i=1:dims2(1,2)
             idx1=idx(i);
-            Temp{n,h}(:,i)=(temp(n,idx(i):(idx(i)+344)));
+            Temp{n,h}(:,i)=(temp(n,idx(i):(idx(i)+229)));
         end 
     end 
 
@@ -151,7 +151,7 @@ end
 cd(db.root)
 name4=strcat('m',db.animal,'_',db.FOV,'_idcells');
 save(name4,'cells')
-clearvars -except data db cells 
+%clearvars -except data db cells 
 
 
 

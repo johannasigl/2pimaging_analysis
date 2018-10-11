@@ -19,33 +19,35 @@ for i=1:numel(cells)
 end 
 %%
 f=figure (6);
-f.Position=[1,1,1000,100];
+f.Position=[100,100,1000,1000];
 vl((1:2),1)=60;
 hl=(0:1);
-idx=tf%(1:10,:);%subslelect cells that have more than 1 day 
+idx=tf;%(1:10,:);%subslelect cells that have more than 1 day 
 %idx=[29 43 47 56 62 85 89];
-for n=1:79
+color=loadcolor;
+dims=size(cells);
+for n=1:dims(1,1)
     subplot (9,9,n)
     plot(vl,hl,'k','lineWidth',0.5)
         hold on
-            for i=[1 2] %7 is the number of recordings 
-            nn=n;%(idx(n));%change here which cells should be plotted
-            if isempty (cells{nn,i})
-            continue 
-            else
+            for i=[1 2 3] %7 is the number of recordings 
+            %nn=n;%(idx(n));%change here which cells should be plotted
+                if isempty (cells{n,i})
+                continue 
+                else
         
-        x=cells{nn,i};
-        fluo=movmean(mean(x'),10);
-        %err=movmean(std(x'),10);
-        err=movmean((std(x')/sqrt(length(x'))),10);
-        %shadedErrorBar([],fluo,err,'lineprops', {'color',co(i,:) }) 
-        shadedErrorBar([],fluo,err)
-        %ylim([-0.5 inf])
-        xlim([50 150])
-        title(nn)
-        box off
-        end 
-        end 
+            x=cells{n,i};
+            fluo=movmean(mean(x'),10);
+            %err=movmean(std(x'),10);
+            err=movmean((std(x')/sqrt(length(x'))),10);
+            %shadedErrorBar([],fluo,err,'lineprops', {'color',co(i,:) }) 
+            shadedErrorBar([],fluo,err,'lineprops', color(n,:))
+            %ylim([-0.5 inf])
+            xlim([1 230])
+            title(n)
+            box off
+                end 
+            end 
        
 end 
 
